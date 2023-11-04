@@ -310,11 +310,13 @@ class Component {
 
       // Set the state based on the button
       if (gamepadButton.pressed || this.values.button === 1) {
+        //@ts-ignore
         this.values.state = Constants.ComponentState.PRESSED;
       } else if (
         gamepadButton.touched ||
         this.values.button > Constants.ButtonTouchThreshold
       ) {
+        //@ts-ignore
         this.values.state = Constants.ComponentState.TOUCHED;
       }
     }
@@ -333,6 +335,7 @@ class Component {
         this.values.state === Constants.ComponentState.DEFAULT &&
         Math.abs(this.values.xAxis) > Constants.AxisTouchThreshold
       ) {
+        //@ts-ignore
         this.values.state = Constants.ComponentState.TOUCHED;
       }
     }
@@ -351,6 +354,7 @@ class Component {
         this.values.state === Constants.ComponentState.DEFAULT &&
         Math.abs(this.values.yAxis) > Constants.AxisTouchThreshold
       ) {
+        //@ts-ignore
         this.values.state = Constants.ComponentState.TOUCHED;
       }
     }

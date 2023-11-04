@@ -1,12 +1,12 @@
 import { Mesh, MeshBasicMaterial, Object3D, SphereGeometry } from "three";
 
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GLTFLoader } from "./GLTFLoader";
 
 import {
   Constants as MotionControllerConstants,
   fetchProfile,
   MotionController,
-} from "./motion-controllers.module.js";
+} from "./motion-controller.module";
 
 const DEFAULT_PROFILES_PATH =
   "https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles";
