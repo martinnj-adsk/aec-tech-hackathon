@@ -1,17 +1,24 @@
 import * as THREE from "three";
 import { VRButton } from "./VRButton.js";
 import { XRControllerModelFactory } from "./XRControllerModelFactory.js";
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const scene = new THREE.Scene();
+scene.add(new THREE.AxesHelper(5))
+
+const light = new THREE.SpotLight()
+light.position.set(5, 5, 5)
+scene.add(light)
 
 const camera = new THREE.PerspectiveCamera(
-  50,
+  75,
   window.innerWidth / window.innerHeight,
   0.1,
-  200
-);
+  1000
+)
 
-camera.position.set(0, 0, 0);
+camera.position.z = 2
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor("#ffffff");
@@ -37,6 +44,26 @@ controllerGrip1.add(
   controllerModelFactory.createControllerModel(controllerGrip1)
 );
 scene.add(controllerGrip1);
+
+const controls = new OrbitControls(camera, renderer.domElement)
+controls.enableDamping = true
+
+const loader = new GLTFLoader();
+
+loader.load(
+	// resource URL
+	'../assets/glb/monkey.glb',
+	// called when the resource is loaded
+	function ( gltf ) {
+    scene.add( gltf.scene );
+  },
+  (xhr) => {
+    console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+  },
+  (error) => {
+    console.log(error)
+  }
+);
 
 function buildController(data) {
   let geometry, material;
@@ -72,14 +99,14 @@ function buildController(data) {
   return new THREE.Mesh();
 }
 
+window.addEventListener("resize", onWindowResize);
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
+  renderer.setSize(window.innerWidth, window.innerHeight)
+  render()
 }
 
-window.addEventListener("resize", onWindowResize);
 
 function box({ x, y, z }) {
   const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -99,8 +126,8 @@ function box({ x, y, z }) {
   };
 
   return cube;
-}
 
+}
 function pull({ x, y, z }) {
   const geometry = new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshBasicMaterial({ color: "#FF1100" });
@@ -146,10 +173,10 @@ function bounce({ x, y, z }) {
 }
 
 const b = box({ x: 0, y: 0, z: -2 });
-scene.add(b);
+// scene.add(b);
 
 const puller = pull({ x: 0, y: -3, z: -10 });
-scene.add(puller);
+// scene.add(puller);
 
 const pusher = push({ x: 0, y: 0, z: -5 });
 //scene.add(pusher)
