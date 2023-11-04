@@ -20,6 +20,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 camera.position.z = 2;
+camera.up.set(0, 0, 1);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor("#ffffff");
@@ -51,20 +52,20 @@ controls.enableDamping = true;
 
 const loader = new GLTFLoader();
 
-loader.load(
-  // resource URL
-  "../assets/glb/monkey.glb",
-  // called when the resource is loaded
-  function (gltf) {
-    scene.add(gltf.scene);
-  },
-  (xhr) => {
-    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-  },
-  (error) => {
-    console.log(error);
-  }
-);
+// loader.load(
+//   // resource URL
+//   "../assets/glb/monkey.glb",
+//   // called when the resource is loaded
+//   function (gltf) {
+//     scene.add(gltf.scene);
+//   },
+//   (xhr) => {
+//     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+//   },
+//   (error) => {
+//     console.log(error);
+//   }
+// );
 
 function buildController(data) {
   let geometry, material;
@@ -140,6 +141,6 @@ buildAnalysisGeometry().then(({ analysisGeometry }) => {
 });
 
 getTerrain().then(({ terrainLines, terrainMesh }) => {
-  // scene.add(terrainLines);
+  scene.add(terrainLines);
   scene.add(terrainMesh);
 });

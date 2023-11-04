@@ -19,7 +19,7 @@ export const retrieveGlb = async (fileName, glbType) => {
 function rotationMatrixYUpToZUp() {
   const rotationMatrix = new THREE.Matrix4();
   // rotationMatrix.makeRotationX(-Math.PI / 2);
-  rotationMatrix.makeRotationY(Math.PI / 2);
+  rotationMatrix.makeRotationY(-Math.PI / 2);
   return rotationMatrix;
 }
 
@@ -40,12 +40,12 @@ export async function getTerrain() {
     category: "terrain",
   });
   const positions = await Forma.geometry.getTriangles({ path: terrain });
-  for (let i = 0; i < positions.length; i += 3) {
-    const y = positions[i + 2];
-    const z = positions[i + 1];
-    positions[i + 2] = z;
-    positions[i + 1] = y;
-  }
+  // for (let i = 0; i < positions.length; i += 3) {
+  //   const y = positions[i + 2];
+  //   const z = positions[i + 1];
+  //   positions[i + 2] = z;
+  //   positions[i + 1] = y;
+  // }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
