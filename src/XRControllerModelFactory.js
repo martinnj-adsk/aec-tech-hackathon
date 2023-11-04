@@ -1,6 +1,6 @@
 import { Mesh, MeshBasicMaterial, Object3D, SphereGeometry } from "three";
 
-import { GLTFLoader } from "./GLTFLoader";
+import { GLTFLoader } from "three/examples/jsm/Addons.js";
 
 import {
   Constants as MotionControllerConstants,
@@ -185,8 +185,9 @@ class XRControllerModelFactory {
       if (
         xrInputSource.targetRayMode !== "tracked-pointer" ||
         !xrInputSource.gamepad
-      )
+      ) {
         return;
+      }
 
       fetchProfile(xrInputSource, this.path, DEFAULT_PROFILE)
         .then(({ profile, assetPath }) => {

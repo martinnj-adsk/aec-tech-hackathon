@@ -1,24 +1,25 @@
 import * as THREE from "three";
-import { VRButton } from "./VRButton.js";
+import { VRButton } from "three/addons/webxr/VRButton.js";
 import { XRControllerModelFactory } from "./XRControllerModelFactory.js";
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { buildAnalysisGeometry, getTerrain } from "./download.js";
 
 const scene = new THREE.Scene();
-scene.add(new THREE.AxesHelper(5))
+scene.add(new THREE.AxesHelper(5));
 
-const light = new THREE.SpotLight()
-light.position.set(5, 5, 5)
-scene.add(light)
+const light = new THREE.SpotLight();
+light.position.set(5, 5, 5);
+scene.add(light);
 
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
   1000
-)
+);
 
-camera.position.z = 2
+camera.position.z = 2;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor("#ffffff");
@@ -45,23 +46,23 @@ controllerGrip1.add(
 );
 scene.add(controllerGrip1);
 
-const controls = new OrbitControls(camera, renderer.domElement)
-controls.enableDamping = true
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
 
 const loader = new GLTFLoader();
 
 loader.load(
-	// resource URL
-	'../assets/glb/monkey.glb',
-	// called when the resource is loaded
-	function ( gltf ) {
-    scene.add( gltf.scene );
+  // resource URL
+  "../assets/glb/monkey.glb",
+  // called when the resource is loaded
+  function (gltf) {
+    scene.add(gltf.scene);
   },
   (xhr) => {
-    console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
   },
   (error) => {
-    console.log(error)
+    console.log(error);
   }
 );
 
@@ -101,96 +102,13 @@ function buildController(data) {
 
 window.addEventListener("resize", onWindowResize);
 function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight
-  camera.updateProjectionMatrix()
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  render()
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  render();
 }
-
-
-function box({ x, y, z }) {
-  const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-  const material = new THREE.MeshBasicMaterial({ color: "#433F81" });
-  const cube = new THREE.Mesh(geometry, material);
-
-  cube.position.x = x;
-  cube.position.y = y;
-  cube.position.z = z;
-
-  cube.userData = {
-    velocity: {
-      dx: 0,
-      dy: 0,
-      dz: 0,
-    },
-  };
-
-  return cube;
-
-}
-function pull({ x, y, z }) {
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: "#FF1100" });
-  const cube = new THREE.Mesh(geometry, material);
-
-  cube.userData = {
-    gravity: 0.001,
-  };
-
-  cube.position.x = x;
-  cube.position.y = y;
-  cube.position.z = z;
-
-  return cube;
-}
-
-function push({ x, y, z }) {
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: "#11FF00" });
-  const cube = new THREE.Mesh(geometry, material);
-
-  cube.userData = {
-    gravity: -0.0001,
-  };
-
-  cube.position.x = x;
-  cube.position.y = y;
-  cube.position.z = z;
-
-  return cube;
-}
-
-function bounce({ x, y, z }) {
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
-  const material = new THREE.MeshBasicMaterial({ color: "#000000" });
-  const cube = new THREE.Mesh(geometry, material);
-
-  cube.position.x = x;
-  cube.position.y = y;
-  cube.position.z = z;
-
-  return cube;
-}
-
-const b = box({ x: 0, y: 0, z: -2 });
-// scene.add(b);
-
-const puller = pull({ x: 0, y: -3, z: -10 });
-// scene.add(puller);
-
-const pusher = push({ x: 0, y: 0, z: -5 });
-//scene.add(pusher)
-
-const bouncer = bounce({ x: 0, y: 0, z: -10 });
-//scene.add(bouncer)
-
-const pullers = [puller /*, pusher*/];
-const bouncers = [
-  /*bouncer*/
-];
 
 let start = false;
-let initialSpeed = 0.1;
 
 let selectStart;
 controller1.addEventListener("selectstart", () => {
@@ -199,75 +117,29 @@ controller1.addEventListener("selectstart", () => {
 
   const dir = v.multiplyScalar(-1);
   dir.normalize();
-  b.position.copy(controller1.position.add(dir));
   selectStart = new Date().getTime();
   start = false;
 });
 
 controller1.addEventListener("selectend", () => {
-  const now = new Date().getTime();
-
-  const pressedFor = (now - selectStart) / 1000;
-  const speed = initialSpeed * pressedFor;
-
   const v = new THREE.Vector3();
   controller1.getWorldDirection(v);
 
   const dir = v.multiplyScalar(-1);
   dir.normalize();
-  b.position.copy(controller1.position.add(dir));
-  b.userData.velocity.dx = dir.x * speed;
-  b.userData.velocity.dy = dir.y * speed;
-  b.userData.velocity.dz = dir.z * speed;
   start = true;
 });
 
 function render() {
-  if (start) {
-    for (let p of pullers) {
-      const p1 = p.position.clone();
-      const p0 = b.position.clone();
-
-      const factor = 1 / p1.distanceTo(p0);
-
-      const d = p1.sub(p0);
-
-      const { x, y, z } = d.multiplyScalar(factor * p.userData.gravity);
-
-      let { dx, dy, dz } = b.userData.velocity;
-
-      dx += x;
-      dy += y;
-      dz += z;
-
-      b.userData.velocity = { dx, dy, dz };
-    }
-
-    for (let bouncer of bouncers) {
-      const p1 = bouncer.position.clone();
-      const p0 = b.position.clone();
-
-      const distance = p1.distanceTo(p0);
-
-      if (distance < 1) {
-        b.userData.velocity.dx = -b.userData.velocity.dx;
-        b.userData.velocity.dy = -b.userData.velocity.dy;
-        b.userData.velocity.dz = -b.userData.velocity.dz;
-      }
-    }
-
-    const { dx, dy, dz } = b.userData.velocity;
-    b.position.x += dx;
-    b.position.y += dy;
-    b.position.z += dz;
-  } else {
-    const v = new THREE.Vector3();
-    controller1.getWorldDirection(v);
-    v.normalize();
-    b.position.copy(controller1.position.add(v.multiplyScalar(-1)));
-  }
-
   renderer.render(scene, camera);
 }
 
 renderer.setAnimationLoop(render);
+buildAnalysisGeometry().then(({ analysisGeometry }) => {
+  scene.add(analysisGeometry);
+});
+
+getTerrain().then(({ terrainLines, terrainMesh }) => {
+  // scene.add(terrainLines);
+  scene.add(terrainMesh);
+});
