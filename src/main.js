@@ -3,14 +3,16 @@ import { VRButton } from "three/addons/webxr/VRButton.js";
 import { XRControllerModelFactory } from "./XRControllerModelFactory.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { buildAnalysisGeometry, getTerrain } from "./download.js";
+import { buildAnalysisGeometry, getBuildings, getTerrain } from "./download.js";
 
 const scene = new THREE.Scene();
-scene.add(new THREE.AxesHelper(5));
-scene.add(new THREE.AxesHelper());
-const light = new THREE.SpotLight();
-light.position.set(5, 5, 5);
-scene.add(light);
+scene.add(new THREE.AxesHelper(50));
+
+
+
+const sunlight = new THREE.DirectionalLight(0xffffff, 0.5);
+sunlight.position.set(500, 500, 500);
+scene.add(sunlight);
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -19,8 +21,9 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-camera.position.z = 2;
-camera.up.set(0, 0, 1);
+camera.position.y = 300;
+camera.position.z = 300;
+// camera.up.set(0, 0, 0);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor("#ffffff");
@@ -136,11 +139,10 @@ function render() {
 }
 
 renderer.setAnimationLoop(render);
-buildAnalysisGeometry().then(({ analysisGeometry }) => {
-  scene.add(analysisGeometry);
-});
 
 getTerrain().then(({ terrainLines, terrainMesh }) => {
   scene.add(terrainLines);
   scene.add(terrainMesh);
 });
+
+getBuildings(scene)
