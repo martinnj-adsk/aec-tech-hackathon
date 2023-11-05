@@ -7,7 +7,7 @@ import { buildAnalysisGeometry, getTerrain } from "./download.js";
 
 const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(5));
-
+scene.add(new THREE.AxesHelper());
 const light = new THREE.SpotLight();
 light.position.set(5, 5, 5);
 scene.add(light);
