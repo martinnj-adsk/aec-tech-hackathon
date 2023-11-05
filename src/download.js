@@ -11,7 +11,6 @@ export const retrieveGlb = async (fileName, glbType) => {
       const onError = (e) => reject(e);
       loader.load(fileName, onLoad, () => {}, onError);
     } catch (err) {
-      console.log(err);
       reject(err);
     }
   });
@@ -89,7 +88,6 @@ export async function getTerrain() {
 
 export async function getNoiseAnalysis() {
   const analysisList = await Forma.analysis.list({ analysisTypes: ["noise"] });
-  console.log(analysisList);
   if (analysisList.length === 0) {
     return;
   }

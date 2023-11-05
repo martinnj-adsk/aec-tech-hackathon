@@ -51,6 +51,5 @@ export function createNoiseCanvas(noiseResult) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, 1, 1);
   }
-  console.log(canvas.toDataURL());
   return canvas;
 }
