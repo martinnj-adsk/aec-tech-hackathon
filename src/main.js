@@ -1,8 +1,7 @@
 import * as THREE from "three";
 import { VRButton } from "three/addons/webxr/VRButton.js";
-import { XRControllerModelFactory } from "./XRControllerModelFactory.js";
+import { XRControllerModelFactory } from "three/addons/webxr/XRControllerModelFactory.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { getBuildings, getTerrain } from "./download.js";
 
 const scene = new THREE.Scene();
@@ -22,31 +21,95 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.y = 300;
 camera.position.z = 300;
 // camera.up.set(0, 0, 0);
-
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor("#ffffff");
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+const tempMatrix = new THREE.Matrix4();
+const raycaster = new THREE.Raycaster();
+const marker = new THREE.Mesh(
+  new THREE.CircleGeometry(0.25, 32).rotateX(-Math.PI / 2),
+  new THREE.MeshBasicMaterial({ color: 0xbcbcbc })
+);
+
+scene.add(marker);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.xr.enabled = true;
+
+renderer.xr.addEventListener(
+  "sessionstart",
+  () => (baseReferenceSpace = renderer.xr.getReferenceSpace())
+);
+
+let baseReferenceSpace;
+let INTERSECTION;
+
+function onSelectEnd() {
+  this.userData.isSelecting = false;
+
+  if (INTERSECTION) {
+    const offsetPosition = {
+      x: -INTERSECTION.x,
+      y: -INTERSECTION.y,
+      z: -INTERSECTION.z,
+      w: 1,
+    };
+    const offsetRotation = new THREE.Quaternion();
+    const transform = new XRRigidTransform(offsetPosition, offsetRotation);
+    const teleportSpaceOffset =
+      baseReferenceSpace.getOffsetReferenceSpace(transform);
+
+    renderer.xr.setReferenceSpace(teleportSpaceOffset);
+  }
+}
+
+function onSelectStart() {
+  this.userData.isSelecting = true;
+}
+
+const controller1 = renderer.xr.getController(0);
+controller1.addEventListener("selectstart", onSelectStart);
+controller1.addEventListener("selectend", onSelectEnd);
+controller1.addEventListener("connected", function (event) {
+  this.add(buildController(event.data));
+});
+controller1.addEventListener("disconnected", function () {
+  this.remove(this.children[0]);
+});
 
 document.body.appendChild(renderer.domElement);
 
 document.body.appendChild(VRButton.createButton(renderer));
 
-const controller1 = renderer.xr.getController(1);
 controller1.addEventListener("connected", (event) => {
   controller1.add(buildController(event.data));
 });
 scene.add(controller1);
 
+const controller2 = renderer.xr.getController(1);
+controller2.addEventListener("selectstart", onSelectStart);
+controller2.addEventListener("selectend", onSelectEnd);
+controller2.addEventListener("connected", function (event) {
+  this.add(buildController(event.data));
+});
+controller2.addEventListener("disconnected", function () {
+  this.remove(this.children[0]);
+});
+scene.add(controller2);
+
 const controllerModelFactory = new XRControllerModelFactory();
 
-const controllerGrip1 = renderer.xr.getControllerGrip(1);
+const controllerGrip1 = renderer.xr.getControllerGrip(0);
 controllerGrip1.add(
   controllerModelFactory.createControllerModel(controllerGrip1)
 );
 scene.add(controllerGrip1);
+
+const controllerGrip2 = renderer.xr.getControllerGrip(1);
+controllerGrip2.add(
+  controllerModelFactory.createControllerModel(controllerGrip2)
+);
+scene.add(controllerGrip2);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -116,6 +179,23 @@ controller1.addEventListener("selectend", () => {
 });
 
 function render() {
+  INTERSECTION = undefined;
+
+  if (controller1.userData.isSelecting === true) {
+    tempMatrix.identity().extractRotation(controller1.matrixWorld);
+
+    raycaster.ray.origin.setFromMatrixPosition(controller1.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+  } else if (controller2.userData.isSelecting === true) {
+    tempMatrix.identity().extractRotation(controller2.matrixWorld);
+
+    raycaster.ray.origin.setFromMatrixPosition(controller2.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+  }
+
+  if (INTERSECTION) marker.position.copy(INTERSECTION);
+
+  marker.visible = INTERSECTION !== undefined;
   renderer.render(scene, camera);
 }
 
