@@ -29,7 +29,7 @@ export async function getBuildings(scene) {
     paths.map((b) => Forma.geometry.getTriangles({ path: b }))
   );
 
-  positions.forEach((m) => {
+  return positions.map((m) => {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute("position", new THREE.BufferAttribute(m, 3));
 
@@ -45,6 +45,7 @@ export async function getBuildings(scene) {
     mesh.rotation.x = -Math.PI / 2;
     scene.add(mesh);
     scene.add(line);
+    return mesh;
   });
 }
 

@@ -10,7 +10,8 @@ scene.add(new THREE.AxesHelper(50));
 const sunlight = new THREE.DirectionalLight(0xffffff, 0.5);
 sunlight.position.set(500, 500, 500);
 scene.add(sunlight);
-
+let terrainMesh;
+let buildingMeshes;
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -186,11 +187,37 @@ function render() {
 
     raycaster.ray.origin.setFromMatrixPosition(controller1.matrixWorld);
     raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+    tempMatrix.identity().extractRotation(controller1.matrixWorld);
+
+    raycaster.ray.origin.setFromMatrixPosition(controller1.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+    const intersects = raycaster.intersectObjects([
+      terrainMesh,
+      ...buildingMeshes,
+    ]);
+
+    if (intersects.length > 0) {
+      INTERSECTION = intersects[0].point;
+    }
   } else if (controller2.userData.isSelecting === true) {
     tempMatrix.identity().extractRotation(controller2.matrixWorld);
 
     raycaster.ray.origin.setFromMatrixPosition(controller2.matrixWorld);
     raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+    tempMatrix.identity().extractRotation(controller1.matrixWorld);
+
+    raycaster.ray.origin.setFromMatrixPosition(controller1.matrixWorld);
+    raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+
+    const intersects = raycaster.intersectObjects([
+      terrainMesh,
+      ...buildingMeshes,
+    ]);
+
+    if (intersects.length > 0) {
+      INTERSECTION = intersects[0].point;
+    }
   }
 
   if (INTERSECTION) marker.position.copy(INTERSECTION);
@@ -204,6 +231,9 @@ renderer.setAnimationLoop(render);
 getTerrain().then(async (res) => {
   scene.add(res.terrainLines);
   scene.add(res.terrainMesh);
+  terrainMesh = res.terrainMesh;
 });
 
-getBuildings(scene);
+getBuildings(scene).then((buildings) => {
+  buildingMeshes = buildings;
+});
