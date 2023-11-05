@@ -65,8 +65,10 @@ export async function getBuildings(scene) {
   );
 
   line.rotation.x = -Math.PI /2
-  const material = new THREE.MeshBasicMaterial({ color: "white" });
+  const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
   const mesh = new THREE.Mesh(geometry, material);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
   mesh.rotation.x = -Math.PI / 2;
   scene.add(mesh)
   scene.add(line)  
@@ -91,7 +93,7 @@ export async function getTerrain() {
   const edges = new THREE.EdgesGeometry(geometry);
   const line = new THREE.LineSegments(
     edges,
-    new THREE.LineBasicMaterial({ color: 0xffffff })
+    new THREE.LineBasicMaterial({ color: 0x5a5a5a })
   );
 
   line.rotation.x = -Math.PI /2

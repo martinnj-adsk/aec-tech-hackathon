@@ -7,12 +7,15 @@ import { buildAnalysisGeometry, getBuildings, getTerrain } from "./download.js";
 
 const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(50));
+scene.background = new THREE.Color(0xeafafe);
 
-
-
-const sunlight = new THREE.DirectionalLight(0xffffff, 0.5);
-sunlight.position.set(500, 500, 500);
+const sunlight = new THREE.DirectionalLight(0xffffff, 1);
+sunlight.castShadow = true;
+sunlight.position.set(0, 1000, 1000);
 scene.add(sunlight);
+
+// const helper = new THREE.CameraHelper(sunlight.shadow.camera)
+// scene.add(helper)
 
 const camera = new THREE.PerspectiveCamera(
   75,
