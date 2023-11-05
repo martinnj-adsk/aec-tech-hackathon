@@ -7,9 +7,10 @@ import { getBuildings, getTerrain } from "./download.js";
 const scene = new THREE.Scene();
 // scene.add(new THREE.AxesHelper(50));
 
-const sunlight = new THREE.DirectionalLight(0xffffff, 0.5);
+const sunlight = new THREE.DirectionalLight(0xffffff, 1);
 sunlight.position.set(500, 500, 500);
 scene.add(sunlight);
+scene.background = new THREE.Color(0xeafafe);
 let terrainMesh;
 let buildingMeshes;
 const camera = new THREE.PerspectiveCamera(

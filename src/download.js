@@ -16,8 +16,6 @@ export const retrieveGlb = async (fileName, glbType) => {
   });
 };
 
-function orientUp() {}
-
 export async function getBuildings(scene) {
   const paths = await Forma.geometry.getPathsByCategory({
     category: "building",
@@ -72,7 +70,7 @@ export async function getTerrain() {
   const edges = new THREE.EdgesGeometry(geometry);
   const line = new THREE.LineSegments(
     edges,
-    new THREE.LineBasicMaterial({ color: 0xffffff })
+    new THREE.LineBasicMaterial({ color: 0x5a5a5a })
   );
   line.position.y -= 250;
   line.rotation.x = -Math.PI / 2;
