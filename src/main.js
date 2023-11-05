@@ -3,12 +3,10 @@ import { VRButton } from "three/addons/webxr/VRButton.js";
 import { XRControllerModelFactory } from "./XRControllerModelFactory.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { buildAnalysisGeometry, getBuildings, getTerrain } from "./download.js";
+import { getBuildings, getTerrain } from "./download.js";
 
 const scene = new THREE.Scene();
 scene.add(new THREE.AxesHelper(50));
-
-
 
 const sunlight = new THREE.DirectionalLight(0xffffff, 0.5);
 sunlight.position.set(500, 500, 500);
@@ -21,15 +19,11 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-camera.position.y = 300;
-camera.position.z = 300;
-// camera.up.set(0, 0, 0);
-
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setClearColor("#ffffff");
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.xr.enabled = true;
 
 document.body.appendChild(renderer.domElement);
@@ -52,23 +46,6 @@ scene.add(controllerGrip1);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-
-const loader = new GLTFLoader();
-
-// loader.load(
-//   // resource URL
-//   "../assets/glb/monkey.glb",
-//   // called when the resource is loaded
-//   function (gltf) {
-//     scene.add(gltf.scene);
-//   },
-//   (xhr) => {
-//     console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-//   },
-//   (error) => {
-//     console.log(error);
-//   }
-// );
 
 function buildController(data) {
   let geometry, material;
@@ -140,9 +117,9 @@ function render() {
 
 renderer.setAnimationLoop(render);
 
-getTerrain().then(({ terrainLines, terrainMesh }) => {
-  scene.add(terrainLines);
-  scene.add(terrainMesh);
+getTerrain().then(async (res) => {
+  scene.add(res.terrainLines);
+  scene.add(res.terrainMesh);
 });
 
-getBuildings(scene)
+getBuildings(scene);

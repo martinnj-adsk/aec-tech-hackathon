@@ -3,12 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "DEV_SdERVER=1 vite",
+    "start": "DEV_SERVER=1 vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
-    "forma-embedded-view-sdk": "0.20",
+    "forma-embedded-view-sdk": "0.21",
     "preact": "^10.13.1",
     "three": "^0.158.0"
   },
