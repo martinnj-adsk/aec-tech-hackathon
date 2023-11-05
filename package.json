@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "vite",
+    "start": "DEV_SdERVER=1 vite",
     "build": "vite build",
     "preview": "vite preview"
   },
