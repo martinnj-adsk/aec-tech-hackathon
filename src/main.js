@@ -5,7 +5,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { getBuildings, getTerrain } from "./download.js";
 
 const scene = new THREE.Scene();
-scene.add(new THREE.AxesHelper(50));
+// scene.add(new THREE.AxesHelper(50));
 
 const sunlight = new THREE.DirectionalLight(0xffffff, 0.5);
 sunlight.position.set(500, 500, 500);
@@ -37,10 +37,9 @@ scene.add(marker);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.xr.enabled = true;
 
-renderer.xr.addEventListener(
-  "sessionstart",
-  () => (baseReferenceSpace = renderer.xr.getReferenceSpace())
-);
+renderer.xr.addEventListener("sessionstart", () => {
+  baseReferenceSpace = renderer.xr.getReferenceSpace();
+});
 
 let baseReferenceSpace;
 let INTERSECTION;

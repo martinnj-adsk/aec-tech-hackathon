@@ -42,6 +42,8 @@ export async function getBuildings(scene) {
     line.rotation.x = -Math.PI / 2;
     const material = new THREE.MeshBasicMaterial({ color: "white" });
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.y -= 250;
+    line.position.y -= 250;
     mesh.rotation.x = -Math.PI / 2;
     scene.add(mesh);
     scene.add(line);
@@ -72,7 +74,7 @@ export async function getTerrain() {
     edges,
     new THREE.LineBasicMaterial({ color: 0xffffff })
   );
-
+  line.position.y -= 250;
   line.rotation.x = -Math.PI / 2;
   const noiseCanvas = await getNoiseAnalysis();
   const canvasTexture = new THREE.CanvasTexture(noiseCanvas);
@@ -83,6 +85,8 @@ export async function getTerrain() {
     opacity: 0.6,
   });
   const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.y -= 250;
+
   mesh.rotation.x = -Math.PI / 2;
   return { terrainMesh: mesh, terrainLines: line };
 }
