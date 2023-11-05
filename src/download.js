@@ -8,7 +8,7 @@ export const retrieveGlb = async (fileName, glbType) => {
       const loader = new GLTFLoader();
       const onLoad = (gltf) => resolve(gltf);
       const onError = (e) => reject(e);
-      loader.load("../assets/blocking.glb", onLoad, () => {}, onError);
+      loader.load("../public/blocking.glb", onLoad, () => {}, onError);
     } catch (err) {
       console.log(err);
       reject(err);
